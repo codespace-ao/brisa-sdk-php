@@ -1,0 +1,32 @@
+{
+    "name": "codespace-ao/brisa-php",
+    "description": "SDK oficial da API Brisa (faturação certificada AGT, Angola) para PHP.",
+    "type": "library",
+    "license": "MIT",
+    "keywords": ["brisa", "faturacao", "agt", "angola", "saft", "invoicing", "sdk"],
+    "homepage": "https://github.com/codespace-ao/brisa-sdk-php",
+    "authors": [{ "name": "Codespace", "email": "geral@codespace.ao" }],
+    "require": {
+        "php": ">=8.1",
+        "ext-curl": "*",
+        "ext-json": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5"
+    },
+    "autoload": {
+        "psr-4": { "Brisa\\": "src/" }
+    },
+    "autoload-dev": {
+        "psr-4": { "Brisa\\Tests\\": "tests/" }
+    },
+    "scripts": {
+        "test": "phpunit --testsuite unit",
+        "test:integration": "phpunit --testsuite integration",
+        "lint": "@php bin/lint.php"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable"
+}
