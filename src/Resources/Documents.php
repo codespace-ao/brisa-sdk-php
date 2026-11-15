@@ -10,6 +10,13 @@ final class Documents extends Resource
     /**
      * Emite `FT`, `FR`, `TV` ou `PF` (`POST /api/v1/documents`). Permissão `invoices.issue`.
      *
+     * Venda direta (`FR`, `TV`): `payment` é um meio e o valor entregue (`['method' => 'cash', 'amountReceived' => 200]`) **ou** vários meios ao mesmo tempo
+     * (`['payments' => [['method' => 'debit_card', 'amount' => 50], ['method' => 'cash', 'amount' => 100]]]`, até 6), nunca os dois. O que se paga cobre o
+     * total; o troco (o que se pagou a mais) sai do numerário, por isso os meios que não são numerário não podem somar mais do que o total (`RuleException`).
+     *
+     * Faturas a pagar mais tarde (`FT`, `PF`): levam os dados bancários da empresa (`$brisa->bank()`); `bankDetails` (`['iban' => ..., 'kwikKey' => ...]`) substitui-os
+     * só nesta fatura e `printBankDetails => false` deixa-os de fora.
+     *
      * @param array<string, mixed> $body  ex.: ['type' => 'FT', 'clientId' => 42, 'lines' => [['productCode' => 'PAR-M8', 'quantity' => 4]]]
      * @param array<string, mixed> $options
      * @return array<string, mixed>
@@ -49,7 +56,10 @@ final class Documents extends Resource
     /**
      * O PDF do documento (bytes). Conta como mais de um pedido no limite da chave: guarde-o em vez de o pedir de cada vez.
      *
-     * @param array<string, mixed> $params ex.: ['copies' => 2]
+     * `format`: `a4` (por omissão), `a5` (o A4 reduzido a meia folha), `thermal80` (talão para rolo de 80 mm; `thermal` é o mesmo) ou `thermal58` (rolo de 58 mm);
+     * os talões só existem para FR, TV, RC e RG. `copy`: `original` ou `second`.
+     *
+     * @param array<string, mixed> $params ex.: ['format' => 'a5', 'copy' => 'second']
      */
     public function pdf(int $documentId, array $params = [], array $options = []): string
     {

@@ -62,12 +62,13 @@ Cada método aceita ainda `$options` com `idempotencyKey`, `timeout`, `maxRetrie
 
 | | |
 |---|---|
-| `$brisa->documents` | `issue`, `list`, `listAll`, `get`, `pdf`, `export` (JSON ou XML), `pay`, `payGlobal`, `cancel`, `rectify`, `creditNote`, `credits`, `history`, `setDueDate`, `send` |
-| `$brisa->clients` | `create`, `update`, `get`, `list`, `listAll`, `setActive` |
+| `$brisa->documents` | `issue`, `list`, `listAll`, `get`, `pdf` (`a4`, `a5`, `thermal80`, `thermal58`), `export` (JSON ou XML), `pay`, `payGlobal`, `cancel`, `rectify`, `creditNote`, `credits`, `history`, `setDueDate`, `send` |
+| `$brisa->clients` | `create`, `update`, `get`, `list` (com `sort`, `desc`, `totals`), `listAll`, `setActive`, `statement`, `statementPdf`, `statementCsv` |
 | `$brisa->products` | `upsert`, `get`, `list`, `listAll`, `moveStock` |
 | `$brisa->catalog` | `taxes`, `exemptionReasons`, `categories` |
 | `$brisa->saft` | `request`, `list`, `get`, `file`, `waitUntilReady` |
 | `$brisa->me()`, `$brisa->company()` | Quem é a chave; os dados da empresa. |
+| `$brisa->bank()`, `$brisa->setBank($dados)` | Os dados bancários da empresa (IBAN verificado), que as faturas por pagar imprimem. |
 | `$brisa->request($method, $path, ...)` | Qualquer outro endpoint, com autenticação, repetições e erros do SDK. |
 | `$brisa->rateLimit()` | Os limites indicados na última resposta (`limit`, `remaining`, `reset`). |
 
@@ -79,6 +80,52 @@ foreach ($brisa->documents->listAll(['type' => 'FT', 'from' => '2026-01-01']) as
     echo $doc['number'], PHP_EOL;
 }
 ```
+
+### Papel: A4, A5 e rolos térmicos
+
+```php
+$a4  = $brisa->documents->pdf($fatura['id']);                              // A4 (por omissão)
+$a5  = $brisa->documents->pdf($fatura['id'], ['format' => 'a5']);          // o A4 reduzido a meia folha
+$r80 = $brisa->documents->pdf($fr['id'], ['format' => 'thermal80']);       // talão para rolo de 80 mm (FR, TV, RC, RG)
+$r58 = $brisa->documents->pdf($fr['id'], ['format' => 'thermal58']);       // talão para rolo de 58 mm
+```
+
+### Venda direta paga com vários meios
+
+Num `FR` ou `TV` pode pagar-se parte em numerário, parte no TPA, parte por transferência. O que se paga cobre o total; o **troco** (o que se pagou a mais) sai do
+numerário, por isso os meios que não são numerário não podem somar mais do que o total (`RuleException`). O talão e a fatura mostram cada meio, o total pago e o troco.
+
+```php
+$fr = $brisa->documents->issue([
+    'type' => 'FR',
+    'lines' => [['description' => 'Cimento 50 kg', 'quantity' => 1, 'unitPrice' => 100]],
+    'payment' => ['payments' => [['method' => 'debit_card', 'amount' => 50], ['method' => 'cash', 'amount' => 100]]], // 114 a pagar: 36 de troco
+]);
+$d = $brisa->documents->get($fr['id']); // $d['paymentMethod'] === 'mixed', $d['payments'], $d['amountReceived']
+```
+
+### Dados bancários nas faturas por pagar
+
+```php
+$brisa->setBank(['bankName' => 'BAI', 'holder' => 'Ngola Comercial, Lda', 'iban' => 'AO06 0040 0000 6789 1234 5678 9', 'kwikKey' => '923000000']);
+$brisa->documents->issue(['type' => 'FT', 'clientId' => 42, 'lines' => $linhas]);                                  // leva os dados da empresa
+$brisa->documents->issue(['type' => 'FT', 'clientId' => 42, 'lines' => $linhas, 'bankDetails' => ['iban' => '...']]); // outros, só nesta fatura
+$brisa->documents->issue(['type' => 'FT', 'clientId' => 42, 'lines' => $linhas, 'printBankDetails' => false]);       // nenhuns
+```
+
+### Clientes: ordem, totais e extrato
+
+```php
+// por quanto se faturou a cada um (`totals` acrescenta invoiced, amountDue, lastInvoiceDate e documents)
+$top = $brisa->clients->list(['sort' => 'invoiced:desc', 'totals' => true, 'size' => 10]);
+
+// a conta corrente do cliente, e para imprimir (precisa também de `reports.export`)
+$extrato = $brisa->clients->statement($id, ['from' => '2026-11-01', 'to' => '2026-11-30']);
+$pdf = $brisa->clients->statementPdf($id);
+$csv = $brisa->clients->statementCsv($id);
+```
+
+Ordens da lista: `name` (por omissão), `taxId`, `city`, `createdAt` e, que pedem os totais, `invoiced`, `due`, `lastInvoice`, `documents`.
 
 ### SAF-T
 

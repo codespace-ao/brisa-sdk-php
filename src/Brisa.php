@@ -21,7 +21,7 @@ use Brisa\Resources\Saft;
  */
 final class Brisa
 {
-    public const VERSION = '0.1.0';
+    public const VERSION = '0.2.0';
 
     public readonly Documents $documents;
     public readonly Clients $clients;
@@ -77,6 +77,28 @@ final class Brisa
     public function company(array $options = []): array
     {
         return $this->http->request('GET', '/api/v1/company', [], $options)->data;
+    }
+
+    /**
+     * Os dados bancários da empresa (`GET /api/v1/company/bank`): o que as suas faturas por pagar dizem sobre como pagar.
+     *
+     * @return array{bankName: string, holder: string, iban: string, accountNumber: string, kwikKey: string, expressNumber: string, notes: string}
+     */
+    public function bank(array $options = []): array
+    {
+        return $this->http->request('GET', '/api/v1/company/bank', [], $options)->data;
+    }
+
+    /**
+     * Substitui os dados bancários da empresa (o IBAN é verificado: um angolano tem 25 caracteres e dígitos de controlo certos; tudo vazio limpa-os).
+     * Permissão `settings.manage`. Devolve o que ficou guardado.
+     *
+     * @param array<string, string> $details `bankName`, `holder`, `iban`, `accountNumber`, `kwikKey`, `expressNumber`, `notes` (todos opcionais)
+     * @return array<string, string>
+     */
+    public function setBank(array $details, array $options = []): array
+    {
+        return $this->http->request('PUT', '/api/v1/company/bank', ['body' => (object) $details], $options)->data;
     }
 
     /**
