@@ -4,39 +4,51 @@ on:
   push: { branches: [main] }
   pull_request:
 
+# Least privilege: jobs only read the repository. Actions are pinned to full commit SHAs (Dependabot keeps them current).
 permissions:
   contents: read
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   check:
-    name: Lint e testes (PHP ${{ matrix.php }})
+    name: Lint and tests (PHP ${{ matrix.php }})
     runs-on: ubuntu-24.04
+    timeout-minutes: 15
     strategy:
+      fail-fast: false
       matrix:
         php: ["8.1", "8.2", "8.3", "8.4"]
     steps:
-      - uses: actions/checkout@v4
-      - uses: shivammathur/setup-php@v2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: { persist-credentials: false }
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # v2
         with:
           php-version: ${{ matrix.php }}
           extensions: curl, json, mbstring
           coverage: none
       - run: composer validate --strict
-      - run: composer install --no-interaction --no-progress
+      - run: composer install --no-interaction --no-progress --no-plugins
+      - name: No known vulnerabilities in the dependencies
+        run: composer audit --no-interaction
       - run: composer lint
       - run: composer test
 
   integration:
-    name: Integração (sandbox)
-    # só corre quando o repositório tem a chave de sandbox e o endereço configurados
+    name: Integration (sandbox)
+    # only on main, and only when the repository has the sandbox key and URL configured
     if: ${{ github.event_name == 'push' }}
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
     env:
       BRISA_API_KEY: ${{ secrets.BRISA_API_KEY }}
       BRISA_API_URL: ${{ vars.BRISA_API_URL }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: shivammathur/setup-php@v2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: { persist-credentials: false }
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # v2
         with: { php-version: "8.4", coverage: none }
-      - run: composer install --no-interaction --no-progress
+      - run: composer install --no-interaction --no-progress --no-plugins
       - run: composer test:integration
