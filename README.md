@@ -107,7 +107,7 @@ $d = $brisa->documents->get($fr['id']); // $d['paymentMethod'] === 'mixed', $d['
 ### Dados bancários nas faturas por pagar
 
 ```php
-$brisa->setBank(['bankName' => 'BAI', 'holder' => 'Ngola Comercial, Lda', 'iban' => 'AO06 0040 0000 6789 1234 5678 9', 'kwikKey' => '923000000']);
+$brisa->setBank(['bankName' => 'BAI', 'holder' => 'Ngola Comercial, Lda', 'iban' => 'AO83 0040 0000 6789 1234 5678 9', 'kwikKey' => '923000000']);
 $brisa->documents->issue(['type' => 'FT', 'clientId' => 42, 'lines' => $linhas]);                                  // leva os dados da empresa
 $brisa->documents->issue(['type' => 'FT', 'clientId' => 42, 'lines' => $linhas, 'bankDetails' => ['iban' => '...']]); // outros, só nesta fatura
 $brisa->documents->issue(['type' => 'FT', 'clientId' => 42, 'lines' => $linhas, 'printBankDetails' => false]);       // nenhuns
