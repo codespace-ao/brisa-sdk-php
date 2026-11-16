@@ -10,12 +10,12 @@ Emita faturas, recibos e notas de crédito, gira clientes e artigos, exporte o S
 
 ## Instalação
 
-O pacote está num repositório privado da Codespace. No `composer.json` do seu projeto:
+O repositório é público. No `composer.json` do seu projeto:
 
 ```json
 {
     "repositories": [{ "type": "vcs", "url": "https://github.com/codespace-ao/brisa-sdk-php" }],
-    "require": { "codespace-ao/brisa-php": "^0.1" }
+    "require": { "codespace-ao/brisa-php": "^0.2" }
 }
 ```
 
@@ -68,7 +68,7 @@ Cada método aceita ainda `$options` com `idempotencyKey`, `timeout`, `maxRetrie
 | `$brisa->catalog` | `taxes`, `exemptionReasons`, `categories` |
 | `$brisa->saft` | `request`, `list`, `get`, `file`, `waitUntilReady` |
 | `$brisa->me()`, `$brisa->company()` | Quem é a chave; os dados da empresa. |
-| `$brisa->bank()`, `$brisa->setBank($dados)` | Os dados bancários da empresa (IBAN verificado), que as faturas por pagar imprimem. |
+| `$brisa->bank()`, `$brisa->setBank($dados)` | Os dados bancários da empresa (o IBAN fica como foi escrito), que as faturas por pagar imprimem. |
 | `$brisa->request($method, $path, ...)` | Qualquer outro endpoint, com autenticação, repetições e erros do SDK. |
 | `$brisa->rateLimit()` | Os limites indicados na última resposta (`limit`, `remaining`, `reset`). |
 
@@ -171,6 +171,14 @@ http_response_code(200);
 
 Use o corpo **bruto**. Durante a troca do segredo pode passar os dois: `Webhook::verify($corpo, $assinatura, [$novo, $anterior])`.
 `Webhook::sign($corpo, $segredo)` calcula o cabeçalho, para testar o seu endpoint.
+
+## Documentação
+
+O guia completo, com exemplos em cURL, JavaScript e PHP, está em [`docs/`](docs/README.md): [primeiros passos](docs/01-primeiros-passos.md), [autenticação](docs/02-autenticacao.md), [documentos](docs/03-documentos.md), [pagamentos](docs/04-pagamentos.md), [impressão](docs/05-impressao.md), [dados bancários](docs/06-dados-bancarios.md), [clientes e extrato](docs/07-clientes-e-extrato.md), [SAF-T](docs/09-saft.md), [webhooks](docs/10-webhooks.md), [erros](docs/11-erros.md) e o [guia de atualização](docs/upgrade.md). A referência de todos os endpoints está em [`docs/openapi.json`](docs/openapi.json).
+
+## Contribuir
+
+Contribuições são bem-vindas: correções, testes, documentação e ideias. Leia o [guia de contribuição](CONTRIBUTING.md) e o [código de conduta](CODE_OF_CONDUCT.md). Para falhas de segurança, **não abra uma issue**: siga a [política de segurança](SECURITY.md).
 
 ## Desenvolvimento
 

@@ -90,7 +90,7 @@ final class Brisa
     }
 
     /**
-     * Substitui os dados bancários da empresa (o IBAN é verificado: um angolano tem 25 caracteres e dígitos de controlo certos; tudo vazio limpa-os).
+     * Substitui os dados bancários da empresa (o IBAN guarda-se como foi escrito, sem verificação; tudo vazio limpa-os).
      * Permissão `settings.manage`. Devolve o que ficou guardado.
      *
      * @param array<string, string> $details `bankName`, `holder`, `iban`, `accountNumber`, `kwikKey`, `expressNumber`, `notes` (todos opcionais)
