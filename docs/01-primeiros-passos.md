@@ -21,7 +21,7 @@ Pode usar a API só com HTTP, mas o SDK repete pedidos falhados, gera as chaves 
 npm install brisa-sdk
 
 # PHP 8.1+
-composer require codespace-ao/brisa-php
+composer require codespace-ao/brisa-sdk
 ```
 
 ## 3. Confirme que a chave funciona

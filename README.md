@@ -15,12 +15,12 @@ O repositório é público. No `composer.json` do seu projeto:
 ```json
 {
     "repositories": [{ "type": "vcs", "url": "https://github.com/codespace-ao/brisa-sdk-php" }],
-    "require": { "codespace-ao/brisa-php": "^0.2" }
+    "require": { "codespace-ao/brisa-sdk": "^0.2" }
 }
 ```
 
 ```bash
-composer update codespace-ao/brisa-php
+composer update codespace-ao/brisa-sdk
 ```
 
 ## Começar

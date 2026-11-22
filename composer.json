@@ -1,5 +1,5 @@
 {
-    "name": "codespace-ao/brisa-php",
+    "name": "codespace-ao/brisa-sdk",
     "description": "SDK oficial da API Brisa (faturação certificada AGT, Angola) para PHP.",
     "type": "library",
     "license": "MIT",
