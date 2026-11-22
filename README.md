@@ -10,17 +10,10 @@ Emita faturas, recibos e notas de crédito, gira clientes e artigos, exporte o S
 
 ## Instalação
 
-O repositório é público. No `composer.json` do seu projeto:
-
-```json
-{
-    "repositories": [{ "type": "vcs", "url": "https://github.com/codespace-ao/brisa-sdk-php" }],
-    "require": { "codespace-ao/brisa-sdk": "^0.2" }
-}
-```
+Instale pelo Packagist:
 
 ```bash
-composer update codespace-ao/brisa-sdk
+composer require codespace-ao/brisa-sdk
 ```
 
 ## Começar
